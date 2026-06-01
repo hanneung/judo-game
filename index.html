@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JUDO REACTION 16-BIT</title>
+    <style>
+        :root {
+            --tatami-green: #5d7a42;
+            --tatami-border: #3e522c;
+            --white-gi: #ffffff;
+            --blue-gi: #2b5797;
+            --pixel-black: #1a1a1a;
+            --ui-yellow: #ffcc00;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Courier New', Courier, monospace;
+            image-rendering: pixelated;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Retro CRT Effect Overlay */
+        #game-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 10;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 900px;
+            background-color: var(--tatami-green);
+            border: 8px solid var(--pixel-black);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Tatami Pattern */
+        .tatami-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--tatami-border) 2px, transparent 2px),
+                linear-gradient(90deg, var(--tatami-border) 2px, transparent 2px);
+            background-size: 40px 80px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* UI Elements */
+        #header {
+            z-index: 5;
+            text-align: center;
+            padding: 20px;
+            color: #fff;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        #status-text {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 10px;
+            min-height: 2.5rem;
+        }
+
+        .timer-display {
+            font-size: 1.5rem;
+            color: var(--ui-yellow);
+            background: rgba(0,0,0,0.7);
+            padding: 5px 15px;
+            border: 3px solid #fff;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* Match Area */
+        #match-area {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 100px;
+            z-index: 2;
+        }
+
+        .character {
+            position: absolute;
+            width: 120px;
+            height: 180px;
+            transition: transform 0.1s;
+        }
+
+        #referee {
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 220px;
+            width: 80px;
+            height: 120px;
+        }
+
+        #player-white { left: 15%; bottom: 100px; }
+        #player-blue { right: 15%; bottom: 100px; transform: scaleX(-1); }
+
+        /* Animations */
+        @keyframes flash {
+            0% { background-color: #fff; }
+            50% { background-color: #ff0000; }
+            100% { background-color: var(--tatami-green); }
+        }
+
+        .signal-flash {
+            animation: flash 0.1s infinite;
+        }
+
+        .bow {
+            transform: translateY(20px) rotateX(30deg);
+        }
+
+        .grabbed {
+            transform: translateX(60px) !important;
+        }
+
+        .blue-grabbed {
+            transform: translateX(-20px) scaleX(-1) !important;
+        }
+
+        .thrown {
+            transform: translate(-100px, -150px) rotate(-110deg) scaleX(-1) !important;
+        }
+
+        /* Controls */
+        #controls {
+            z-index: 20;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .game-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            background-color: #e74c3c;
+            border: 6px solid #c0392b;
+            box-shadow: 0 6px 0 #922b21;
+            cursor: pointer;
+            text-shadow: 2px 2px 0 #000;
+            active-transform: translateY(4px);
+        }
+
+        .game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #922b21;
+        }
+
+        .game-btn:disabled {
+            background-color: #7f8c8d;
+            border-color: #95a5a6;
+            box-shadow: 0 6px 0 #6d7879;
+            cursor: not-allowed;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="tatami-bg"></div>
+    
+    <div id="header">
+        <div style="font-size: 1rem;">JUDO REACTION TIMER</div>
+        <div id="status-text">HAJIME! (시작!)</div>
+        <div id="timer" class="timer-display">[00:00.00]</div>
+    </div>
+
+    <div id="match-area">
+        <!-- Referee SVG -->
+        <div id="referee" class="character">
+            <svg viewBox="0 0 100 150">
+                <rect x="35" y="20" width="30" height="30" fill="#f3dbb9" /> <!-- Head -->
+                <rect x="30" y="50" width="40" height="60" fill="#000" /> <!-- Suit -->
+                <rect x="40" y="110" width="10" height="30" fill="#000" /> <!-- Leg L -->
+                <rect x="50" y="110" width="10" height="30" fill="#000" /> <!-- Leg R -->
+            </svg>
+        </div>
+
+        <!-- White Player SVG -->
+        <div id="player-white" class="character">
+            <svg viewBox="0 0 100 180">
+                <rect x="30" y="20" width="40" height="40" fill="#f3dbb9" /> <!-- Head -->
+                <rect x="20" y="60" width="60" height="80" fill="white" stroke="#ccc" stroke-width="2"/> <!-- Gi -->
+                <rect x="20" y="100" width="60" height="10" fill="black" /> <!-- Belt -->
+                <rect x="25" y="140" width="20" height="40" fill="white" stroke="#ccc" stroke-width="2"/> <!-- Leg L -->
+                <rect x="55" y="140" width="20" height="40" fill="white" stroke="#ccc" stroke-width="2"/> <!-- Leg R -->
+                <!-- Arms -->
+                <rect id="arm-l" x="0" y="70" width="25" height="15" fill="white" />
+                <rect id="arm-r" x="75" y="70" width="25" height="15" fill="white" />
+            </svg>
+        </div>
+
+        <!-- Blue Player SVG -->
+        <div id="player-blue" class="character">
+            <svg viewBox="0 0 100 180">
+                <rect x="30" y="20" width="40" height="40" fill="#f3dbb9" />
+                <rect x="20" y="60" width="60" height="80" fill="#2b5797" stroke="#1a3a63" stroke-width="2"/>
+                <rect x="20" y="100" width="60" height="10" fill="black" />
+                <rect x="25" y="140" width="20" height="40" fill="#2b5797" stroke="#1a3a63" stroke-width="2"/>
+                <rect x="55" y="140" width="20" height="40" fill="#2b5797" stroke="#1a3a63" stroke-width="2"/>
+            </svg>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button id="main-btn" class="game-btn">START MATCH<br>(시합 시작)</button>
+    </div>
+</div>
+
+<script>
+    const state = {
+        IDLE: 'IDLE',
+        BOWING: 'BOWING',
+        WAITING: 'WAITING',
+        GRABBED: 'GRABBED',
+        RESULT: 'RESULT',
+        FOUL: 'FOUL'
+    };
+
+    let currentState = state.IDLE;
+    let startTime = 0;
+    let timerInterval = null;
+    let reactionTimeout = null;
+
+    const mainBtn = document.getElementById('main-btn');
+    const statusText = document.getElementById('status-text');
+    const timerDisplay = document.getElementById('timer');
+    const playerWhite = document.getElementById('player-white');
+    const playerBlue = document.getElementById('player-blue');
+    const gameContainer = document.getElementById('game-container');
+
+    // Precision Formatter
+    function formatTime(ms) {
+        const totalSeconds = ms / 1000;
+        const s = Math.floor(totalSeconds % 60);
+        const ss = (totalSeconds % 1).toFixed(2).substring(2);
+        return `[00:${s.toString().padStart(2, '0')}.${ss}]`;
+    }
+
+    function updateTimer() {
+        const now = performance.now();
+        const diff = now - startTime;
+        timerDisplay.textContent = formatTime(diff);
+    }
+
+    function triggerFoul() {
+        clearTimeout(reactionTimeout);
+        currentState = state.FOUL;
+        statusText.textContent = "FOUL! (반칙패)";
+        statusText.style.color = "#ff4444";
+        mainBtn.textContent = "RESTART";
+        mainBtn.disabled = false;
+        playerWhite.style.opacity = "0.5";
+    }
+
+    function startBowing() {
+        currentState = state.BOWING;
+        mainBtn.disabled = true;
+        mainBtn.textContent = "WAIT...";
+        statusText.textContent = "REI! (차렷, 경례)";
+        
+        // Bow animation
+        playerWhite.classList.add('bow');
+        playerBlue.classList.add('bow');
+
+        setTimeout(() => {
+            playerWhite.classList.remove('bow');
+            playerBlue.classList.remove('bow');
+            startWaiting();
+        }, 1500);
+    }
+
+    function startWaiting() {
+        currentState = state.WAITING;
+        statusText.textContent = "READY... (준비...)";
+        
+        const delay = Math.random() * 2000 + 1000; // 1-3 seconds
+        reactionTimeout = setTimeout(triggerReaction, delay);
+    }
+
+    function triggerReaction() {
+        currentState = state.GRABBED;
+        startTime = performance.now();
+        
+        // Visual cue
+        gameContainer.classList.add('signal-flash');
+        statusText.textContent = "GRABBED! (잡았다!)";
+        statusText.style.color = "#fff";
+        
+        // Action change
+        mainBtn.disabled = false;
+        mainBtn.textContent = "THROW (메치기)";
+        mainBtn.style.backgroundColor = "#2ecc71";
+        mainBtn.style.borderColor = "#27ae60";
+
+        // Animation
+        playerWhite.classList.add('grabbed');
+        playerBlue.classList.add('blue-grabbed');
+
+        // Start Stopwatch
+        timerInterval = setInterval(updateTimer, 10);
+    }
+
+    function handleThrow() {
+        clearInterval(timerInterval);
+        const finalTime = performance.now() - startTime;
+        currentState = state.RESULT;
+        
+        gameContainer.classList.remove('signal-flash');
+        
+        const skills = ["Seoi-nage (업어치기)", "Uchi-mata (허벅다리)"];
+        const randomSkill = skills[Math.floor(Math.random() * skills.length)];
+        
+        statusText.textContent = `IPPON! (한판!)\n${randomSkill}`;
+        timerDisplay.textContent = formatTime(finalTime);
+        
+        playerBlue.classList.add('thrown');
+        
+        createConfetti();
+        
+        mainBtn.textContent = "REMATCH?";
+        mainBtn.style.backgroundColor = "#e74c3c";
+        mainBtn.style.borderColor = "#c0392b";
+    }
+
+    function createConfetti() {
+        for (let i = 0; i < 50; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + '%';
+            c.style.top = '-10px';
+            c.style.backgroundColor = ['#f1c40f', '#e67e22', '#e74c3c', '#3498db', '#fff'][Math.floor(Math.random() * 5)];
+            document.body.appendChild(c);
+
+            const fallDuration = Math.random() * 2 + 1;
+            c.animate([
+                { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], {
+                duration: fallDuration * 1000,
+                easing: 'cubic-bezier(0,.37,1,.63)'
+            });
+
+            setTimeout(() => c.remove(), fallDuration * 1000);
+        }
+    }
+
+    function resetGame() {
+        currentState = state.IDLE;
+        statusText.textContent = "HAJIME! (시작!)";
+        statusText.style.color = "#fff";
+        timerDisplay.textContent = "[00:00.00]";
+        mainBtn.textContent = "START MATCH (시합 시작)";
+        playerWhite.classList.remove('grabbed', 'bow');
+        playerBlue.classList.remove('blue-grabbed', 'thrown', 'bow');
+        playerWhite.style.opacity = "1";
+        gameContainer.classList.remove('signal-flash');
+    }
+
+    // Unified Input Handler
+    function handleInteraction(e) {
+        e.preventDefault();
+        
+        if (currentState === state.IDLE || currentState === state.RESULT || currentState === state.FOUL) {
+            resetGame();
+            startBowing();
+        } else if (currentState === state.WAITING) {
+            triggerFoul();
+        } else if (currentState === state.GRABBED) {
+            handleThrow();
+        }
+    }
+
+    mainBtn.addEventListener('mousedown', handleInteraction);
+    mainBtn.addEventListener('touchstart', handleInteraction);
+
+    // Initial state
+    resetGame();
+</script>
+</body>
+</html>
