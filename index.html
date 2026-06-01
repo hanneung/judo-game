@@ -3,487 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JUDO REACTION 16-BIT PRO MAX</title>
+    <title>JUDO REACTION 16-BIT ULTIMATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            --pixel-size: 4px;
             --tatami-yellow: #d4bc82;
             --tatami-border: #8b7355;
             --dojo-wall: #e0d7c6;
             --white-gi: #ffffff;
-            --white-gi-shadow: #d1d1d1;
+            --white-gi-shadow: #c0c0c0;
             --blue-gi: #2b5797;
             --blue-gi-shadow: #1a3a63;
             --skin-tone: #f3dbb9;
-            --skin-shadow: #e0b080;
+            --skin-shadow: #d1b18a;
             --ui-gold: #ffd700;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            image-rendering: pixelated;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100dvh;
-            background-color: #1a1a1a;
-            overflow: hidden;
-            font-family: 'Press Start 2P', cursive;
-            color: white;
+            margin: 0; padding: 0; width: 100%; height: 100dvh;
+            background-color: #111; overflow: hidden;
+            font-family: 'Press Start 2P', cursive; color: white;
         }
 
         #game-container {
-            position: relative;
-            width: 100%;
-            height: 100dvh;
-            max-width: 600px;
-            margin: 0 auto;
+            position: relative; width: 100%; height: 100dvh;
+            max-width: 600px; margin: 0 auto;
             background: var(--dojo-wall);
-            border-left: 8px solid #000;
-            border-right: 8px solid #000;
-            display: flex;
-            flex-direction: column;
+            border-left: 10px solid #000; border-right: 10px solid #000;
+            display: flex; flex-direction: column;
         }
 
         /* 16-Bit Dojo Background */
         .dojo-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 60%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 60%;
             background: 
-                linear-gradient(to bottom, #444 0%, #222 20%, transparent 20%),
-                repeating-linear-gradient(90deg, #ccc 0, #ccc 2px, transparent 2px, transparent 40px);
+                linear-gradient(to bottom, #333 0%, #111 20%, transparent 20%),
+                repeating-linear-gradient(90deg, #b0a796 0, #b0a796 4px, transparent 4px, transparent 40px);
             z-index: 1;
         }
 
         .scroll {
-            position: absolute;
-            top: 40px; left: 50%;
-            transform: translateX(-50%);
-            width: 60px; height: 100px;
-            background: #fff;
-            border: 4px solid #8b4513;
-            box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
-            writing-mode: vertical-rl;
-            color: #000;
-            font-size: 14px;
-            text-align: center;
-            padding: 5px;
+            position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 120px; background: #fff;
+            border: 6px solid #5c3a21; box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
+            writing-mode: vertical-rl; color: #000; font-size: 20px;
+            text-align: center; padding: 10px; font-weight: bold;
         }
 
         .tatami-floor {
-            position: absolute;
-            bottom: 0; width: 100%; height: 45%;
+            position: absolute; bottom: 0; width: 100%; height: 45%;
             background-color: var(--tatami-yellow);
             background-image: 
-                linear-gradient(var(--tatami-border) 2px, transparent 2px),
-                linear-gradient(90deg, var(--tatami-border) 2px, transparent 2px);
-            background-size: 100px 50px;
-            border-top: 10px solid #5d4037;
-            z-index: 2;
+                linear-gradient(var(--tatami-border) 4px, transparent 4px),
+                linear-gradient(90deg, var(--tatami-border) 4px, transparent 4px);
+            background-size: 120px 60px;
+            border-top: 12px solid #3e2723; z-index: 2;
         }
 
-        /* UI Layer - 크기 대폭 확대 */
+        /* 고도화된 UI 레이어 (가독성/크기 대폭 개선) */
         #ui-layer {
-            position: relative;
-            z-index: 10;
-            padding: 30px 20px;
-            text-align: center;
+            position: relative; z-index: 10; padding: 30px 10px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        #status-container {
+            background-color: #222;
+            border: 6px solid var(--ui-gold);
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            box-shadow: 6px 6px 0 #000;
+            border-radius: 4px;
         }
 
         #status-text {
-            font-size: 24px;
-            margin-bottom: 15px;
-            text-shadow: 4px 4px 0 #000;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.4;
+            font-size: 28px; /* 한글 폰트 크기 대폭 확대 */
+            text-shadow: 3px 3px 0 #000;
+            text-align: center;
+            line-height: 1.5;
+            margin: 0;
+            white-space: pre-wrap;
         }
 
         .timer-box {
-            display: inline-block;
-            background: #000;
-            padding: 15px 20px;
-            border: 6px solid var(--ui-gold);
-            font-size: 28px;
-            color: var(--ui-gold);
-            box-shadow: 4px 4px 0 #000;
+            background: #000; padding: 15px 25px;
+            border: 6px solid #fff; font-size: 32px;
+            color: #fff; box-shadow: 6px 6px 0 #000;
         }
 
-        /* Character Sprites */
+        /* Character Sprites (픽셀 테두리 추가를 위한 CSS/SVG 연동) */
         .sprite-container {
-            position: absolute;
-            bottom: 15%;
-            width: 200px;
-            height: 250px;
-            z-index: 5;
-            transition: transform 0.2s, left 0.3s, right 0.3s;
+            position: absolute; bottom: 15%; width: 220px; height: 260px;
+            z-index: 5; transition: transform 0.2s, left 0.3s, right 0.3s;
         }
 
-        #referee { left: 50%; transform: translateX(-50%) scale(0.8); bottom: 35%; }
-        /* 시작 거리 조정 (10% -> 5% 등 간격 넓힘) */
-        #player-white { left: 2%; } 
-        #player-blue { right: 2%; transform: scaleX(-1); }
-
-        /* Animation Classes */
-        .bow-white { transform: rotate(20deg) translateY(10px); }
-        .bow-blue { transform: scaleX(-1) rotate(20deg) translateY(10px); }
-        
-        .arm { transition: transform 0.15s ease-out; transform-origin: top center; }
-        .face-part { transition: all 0.1s; }
-
-        /* 잡기 (거리를 좁히고 팔을 뻗음) */
-        .grab-white { left: 22% !important; }
-        .grab-white .arm-front { transform: rotate(-70deg); }
-        
-        .grab-blue { right: 22% !important; transform: scaleX(-1); }
-        .grab-blue .arm-front { transform: rotate(-70deg); }
-
-        /* 메치기: 업어치기 (Seoi-nage) */
-        .tori-seoi { animation: tori-seoi-anim 0.7s forwards; }
-        @keyframes tori-seoi-anim {
-            0% { left: 22%; transform: scaleX(1); }
-            30% { left: 40%; transform: scaleX(-1) translateY(20px); } /* 몸을 틀어 파고듦 */
-            100% { left: 45%; transform: scaleX(-1) rotate(-25deg); }
-        }
-
-        .uke-seoi { animation: uke-seoi-anim 0.7s forwards; }
-        @keyframes uke-seoi-anim {
-            0% { right: 22%; transform: scaleX(-1); }
-            40% { right: 40%; transform: scaleX(-1) translate(-100px, -180px) rotate(120deg); } /* 공중으로 날아감 */
-            100% { right: 60%; transform: scaleX(-1) translate(-280px, 80px) rotate(260deg); opacity: 0.8; } /* 떨어짐 */
-        }
-
-        /* 메치기: 허벅다리 (Uchi-mata) */
-        .tori-uchi { animation: tori-uchi-anim 0.7s forwards; }
-        @keyframes tori-uchi-anim {
-            0% { left: 22%; }
-            40% { left: 35%; transform: rotate(15deg); }
-            100% { left: 40%; transform: rotate(-5deg); }
-        }
-
-        .uke-uchi { animation: uke-uchi-anim 0.7s forwards; }
-        @keyframes uke-uchi-anim {
-            0% { right: 22%; transform: scaleX(-1); }
-            40% { right: 35%; transform: scaleX(-1) translate(-60px, -140px) rotate(90deg); }
-            100% { right: 75%; transform: scaleX(-1) translate(-250px, 90px) rotate(220deg); opacity: 0.8; }
-        }
-
-        /* Controls */
-        #controls {
-            position: absolute;
-            bottom: 40px;
-            width: 100%;
-            padding: 0 30px;
-            z-index: 100;
-        }
-
-        .pixel-btn {
-            width: 100%;
-            padding: 25px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 24px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-bottom: 10px solid #c0392b;
-            cursor: pointer;
-            text-shadow: 3px 3px 0 #000;
-        }
-
-        .pixel-btn:active {
-            margin-top: 6px;
-            border-bottom-width: 4px;
-        }
-
-        .pixel-btn:disabled {
-            background: #7f8c8d;
-            border-bottom-color: #95a5a6;
-        }
-
-        /* Confetti & Flash */
-        .flash { animation: screen-flash 0.1s 3; }
-        @keyframes screen-flash {
-            0%, 100% { background: var(--dojo-wall); }
-            50% { background: #fff; }
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px; height: 10px;
-            z-index: 1000;
-        }
-    </style>
-</head>
-<body>
-
-<div id="game-container">
-    <div class="dojo-bg">
-        <div class="scroll">柔道</div>
-    </div>
-    <div class="tatami-floor"></div>
-
-    <div id="ui-layer">
-        <div id="status-text">시합 대기</div>
-        <div class="timer-box" id="timer-display">[00:00.00]</div>
-    </div>
-
-    <div id="match-area">
-        <div id="referee" class="sprite-container">
-            <svg viewBox="0 0 100 150">
-                <rect x="35" y="10" width="30" height="30" fill="var(--skin-tone)" />
-                <rect x="35" y="25" width="30" height="5" fill="var(--skin-shadow)" />
-                <rect x="25" y="40" width="50" height="80" fill="#000" />
-                <rect x="40" y="50" width="20" height="30" fill="#fff" />
-                <rect x="48" y="50" width="4" height="30" fill="#000" />
-            </svg>
-        </div>
-
-        <div id="player-white" class="sprite-container">
-            <svg viewBox="0 0 120 200">
-                <rect x="40" y="10" width="40" height="40" fill="var(--skin-tone)" /> 
-                <rect x="40" y="35" width="40" height="10" fill="var(--skin-shadow)" />
-                <g id="face-white">
-                    <rect class="face-part" x="48" y="22" width="6" height="6" fill="#000" /> <rect class="face-part" x="66" y="22" width="6" height="6" fill="#000" /> <rect class="face-part mouth" id="mouth-white" x="55" y="36" width="10" height="4" fill="#000" /> </g>
-                
-                <path d="M25,50 L95,50 L105,140 L15,140 Z" fill="var(--white-gi)" />
-                <path d="M60,50 L95,50 L105,140 L60,140 Z" fill="var(--white-gi-shadow)" opacity="0.3"/>
-                
-                <rect class="arm arm-back" x="20" y="55" width="22" height="65" fill="var(--white-gi)" />
-                
-                <rect x="15" y="100" width="90" height="12" fill="#000" />
-                
-                <rect x="30" y="140" width="25" height="50" fill="var(--white-gi)" />
-                <rect x="65" y="140" width="25" height="50" fill="var(--white-gi)" />
-                <rect x="30" y="180" width="25" height="10" fill="var(--skin-tone)" />
-                <rect x="65" y="180" width="25" height="10" fill="var(--skin-tone)" />
-                
-                <rect class="arm arm-front" x="78" y="55" width="22" height="65" fill="var(--white-gi)" />
-            </svg>
-        </div>
-
-        <div id="player-blue" class="sprite-container">
-            <svg viewBox="0 0 120 200">
-                <rect x="40" y="10" width="40" height="40" fill="var(--skin-tone)" />
-                <rect x="40" y="35" width="40" height="10" fill="var(--skin-shadow)" />
-                <g id="face-blue">
-                    <rect class="face-part" x="48" y="22" width="6" height="6" fill="#000" />
-                    <rect class="face-part" x="66" y="22" width="6" height="6" fill="#000" />
-                    <rect class="face-part mouth" id="mouth-blue" x="55" y="36" width="10" height="4" fill="#000" />
-                </g>
-                
-                <path d="M25,50 L95,50 L105,140 L15,140 Z" fill="var(--blue-gi)" />
-                <path d="M60,50 L95,50 L105,140 L60,140 Z" fill="var(--blue-gi-shadow)" opacity="0.4"/>
-                
-                <rect class="arm arm-back" x="20" y="55" width="22" height="65" fill="var(--blue-gi)" />
-                <rect x="15" y="100" width="90" height="12" fill="#000" />
-                
-                <rect x="30" y="140" width="25" height="50" fill="var(--blue-gi)" />
-                <rect x="65" y="140" width="25" height="50" fill="var(--blue-gi)" />
-                
-                <rect class="arm arm-front" x="78" y="55" width="22" height="65" fill="var(--blue-gi)" />
-            </svg>
-        </div>
-    </div>
-
-    <div id="controls">
-        <button id="main-btn" class="pixel-btn">시합 시작<br>(START)</button>
-    </div>
-</div>
-
-<script>
-    const state = {
-        IDLE: 'IDLE',
-        BOWING: 'BOWING',
-        READY: 'READY',
-        GRABBED: 'GRABBED',
-        FINISH: 'FINISH',
-        FOUL: 'FOUL'
-    };
-
-    let curState = state.IDLE;
-    let startTime = 0;
-    let reactionTimer = null;
-    let stopwatchInterval = null;
-
-    const btn = document.getElementById('main-btn');
-    const status = document.getElementById('status-text');
-    const timerTxt = document.getElementById('timer-display');
-    const tori = document.getElementById('player-white'); 
-    const uke = document.getElementById('player-blue');   
-    const container = document.getElementById('game-container');
-
-    function formatTime(ms) {
-        const total = ms / 1000;
-        const s = Math.floor(total % 60).toString().padStart(2, '0');
-        const msPart = (total % 1).toFixed(2).substring(2);
-        return `[00:${s}.${msPart}]`;
-    }
-
-    // 표정 관리 함수
-    function setFace(player, type) {
-        const mouth = document.getElementById(`mouth-${player}`);
-        if (!mouth) return;
-        
-        if (type === 'tense') { // 꽉 다문 입
-            mouth.setAttribute('width', '16');
-            mouth.setAttribute('x', '52');
-            mouth.setAttribute('height', '2');
-            mouth.removeAttribute('rx');
-        } else if (type === 'shock') { // 당황해 벌린 입
-            mouth.setAttribute('width', '12');
-            mouth.setAttribute('height', '12');
-            mouth.setAttribute('x', '54');
-            mouth.setAttribute('y', '32');
-            mouth.setAttribute('rx', '4');
-        } else { // 기본
-            mouth.setAttribute('width', '10');
-            mouth.setAttribute('height', '4');
-            mouth.setAttribute('x', '55');
-            mouth.setAttribute('y', '36');
-            mouth.removeAttribute('rx');
-        }
-    }
-
-    function resetVisuals() {
-        tori.className = 'sprite-container';
-        uke.className = 'sprite-container';
-        container.classList.remove('flash');
-        status.style.color = "white";
-        tori.style.opacity = "1";
-        uke.style.opacity = "1";
-        setFace('white', 'idle');
-        setFace('blue', 'idle');
-    }
-
-    function triggerFoul() {
-        clearTimeout(reactionTimer);
-        curState = state.FOUL;
-        status.textContent = "반칙패 / FALSE START!";
-        status.style.color = "#ff4444";
-        btn.textContent = "RESTART";
-        btn.disabled = false;
-        tori.style.opacity = "0.5";
-    }
-
-    function startMatch() {
-        curState = state.BOWING;
-        resetVisuals();
-        btn.disabled = true;
-        btn.textContent = "WAIT...";
-        status.textContent = "차렷, 경례! (REI)";
-        
-        // 동시 인사 적용
-        tori.classList.add('bow-white');
-        uke.classList.add('bow-blue');
-
-        setTimeout(() => {
-            tori.classList.remove('bow-white');
-            uke.classList.remove('bow-blue');
-            curState = state.READY;
-            status.textContent = "준비... (Hajime soon)";
-            
-            const delay = Math.random() * 2000 + 1500;
-            reactionTimer = setTimeout(onGrabTrigger, delay);
-        }, 1200);
-    }
-
-    function onGrabTrigger() {
-        curState = state.GRABBED;
-        startTime = performance.now();
-        
-        status.innerHTML = "잡았다!<br>(GRABBED!)";
-        status.style.color = "#ffff00";
-        btn.disabled = false;
-        btn.innerHTML = "메치기!<br>(THROW!)";
-        btn.style.backgroundColor = "#2ecc71";
-        btn.style.borderBottomColor = "#27ae60";
-
-        // 팔을 뻗으며 거리를 좁힘 + 표정 변화
-        tori.classList.add('grab-white');
-        uke.classList.add('grab-blue');
-        setFace('white', 'tense'); // 주인공은 기합
-        setFace('blue', 'shock');  // 상대는 당황
-
-        stopwatchInterval = setInterval(() => {
-            const now = performance.now();
-            timerTxt.textContent = formatTime(now - startTime);
-        }, 10);
-    }
-
-    function performThrow() {
-        clearInterval(stopwatchInterval);
-        const finalTime = performance.now() - startTime;
-        curState = state.FINISH;
-        
-        container.classList.add('flash');
-        
-        const isSeoi = Math.random() > 0.5;
-        const techniqueName = isSeoi ? "업어치기" : "허벅다리";
-        
-        status.innerHTML = `한판! (IPPON!)<br>${techniqueName}`;
-        timerTxt.textContent = formatTime(finalTime);
-
-        // 클래스 변경으로 메치기 애니메이션 실행
-        tori.classList.remove('grab-white');
-        uke.classList.remove('grab-blue');
-
-        if (isSeoi) {
-            tori.classList.add('tori-seoi');
-            uke.classList.add('uke-seoi');
-        } else {
-            tori.classList.add('tori-uchi');
-            uke.classList.add('uke-uchi');
-        }
-
-        createConfetti();
-        
-        btn.innerHTML = "다시 하기<br>(REMATCH)";
-        btn.style.backgroundColor = "#e74c3c";
-        btn.style.borderBottomColor = "#c0392b";
-    }
-
-    function createConfetti() {
-        for (let i = 0; i < 40; i++) {
-            const c = document.createElement('div');
-            c.className = 'confetti';
-            c.style.left = Math.random() * 100 + '%';
-            c.style.top = '20%';
-            c.style.backgroundColor = ['#f1c40f', '#fff', '#e74c3c', '#3498db'][Math.floor(Math.random()*4)];
-            document.body.appendChild(c);
-            
-            const destX = (Math.random() - 0.5) * 400;
-            const destY = Math.random() * 400 + 200;
-            
-            c.animate([
-                { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
-                { transform: `translate(${destX}px, ${destY}px) rotate(720deg)`, opacity: 0 }
-            ], {
-                duration: 1000 + Math.random() * 1000,
-                easing: 'cubic-bezier(0, .9, .6, 1)'
-            }).onfinish = () => c.remove();
-        }
-    }
-
-    function handleInteraction() {
-        if (curState === state.IDLE || curState === state.FINISH || curState === state.FOUL) {
-            startMatch();
-        } else if (curState === state.READY) {
-            triggerFoul();
-        } else if (curState === state.GRABBED) {
-            performThrow();
-        }
-    }
-
-    btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleInteraction(); });
-    btn.addEventListener('mousedown', (e) => { e.preventDefault(); handleInteraction(); });
-
-</script>
-</body>
-</html>
+        /* SVG 내부 픽셀 아트 스타일
