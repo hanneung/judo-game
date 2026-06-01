@@ -101,4 +101,338 @@
             z-index: 5; transition: transform 0.2s, left 0.3s, right 0.3s;
         }
 
-        /* SVG 내부 픽셀 아트 스타일
+        /* SVG 내부 픽셀 아트 스타일 적용 */
+        svg { shape-rendering: crispEdges; }
+        .pixel-stroke { stroke: #000; stroke-width: 3.5px; }
+
+        #referee { left: 50%; transform: translateX(-50%) scale(0.7); bottom: 35%; }
+        #player-white { left: 2%; }
+        #player-blue { right: 2%; transform: scaleX(-1); }
+
+        /* 애니메이션 클래스 - ID 선택자를 덮어쓰기 위해 선택자 강화 */
+        #player-white.bow-white { transform: rotate(25deg) translateY(10px); }
+        #player-blue.bow-blue { transform: scaleX(-1) rotate(25deg) translateY(10px); } /* 청도복 인사 수정 완료! */
+        
+        .arm { transition: transform 0.15s ease-out; transform-origin: top center; }
+        .face-part { transition: all 0.1s; }
+
+        /* 잡기 모션 */
+        #player-white.grab-white { left: 22%; }
+        #player-white.grab-white .arm-front { transform: rotate(-75deg); }
+        
+        #player-blue.grab-blue { right: 22%; transform: scaleX(-1); }
+        #player-blue.grab-blue .arm-front { transform: rotate(-75deg); }
+
+        /* 메치기 애니메이션 강화 */
+        #player-white.tori-seoi { animation: tori-seoi-anim 0.6s forwards; }
+        @keyframes tori-seoi-anim {
+            0% { left: 22%; transform: scaleX(1); }
+            30% { left: 40%; transform: scaleX(-1) translateY(20px); }
+            100% { left: 45%; transform: scaleX(-1) rotate(-30deg); }
+        }
+
+        #player-blue.uke-seoi { animation: uke-seoi-anim 0.6s forwards; }
+        @keyframes uke-seoi-anim {
+            0% { right: 22%; transform: scaleX(-1); }
+            40% { right: 40%; transform: scaleX(-1) translate(-100px, -200px) rotate(140deg); }
+            100% { right: 70%; transform: scaleX(-1) translate(-300px, 90px) rotate(280deg); opacity: 0.8; }
+        }
+
+        #player-white.tori-uchi { animation: tori-uchi-anim 0.6s forwards; }
+        @keyframes tori-uchi-anim {
+            0% { left: 22%; }
+            40% { left: 35%; transform: rotate(20deg); }
+            100% { left: 42%; transform: rotate(-10deg); }
+        }
+
+        #player-blue.uke-uchi { animation: uke-uchi-anim 0.6s forwards; }
+        @keyframes uke-uchi-anim {
+            0% { right: 22%; transform: scaleX(-1); }
+            40% { right: 35%; transform: scaleX(-1) translate(-60px, -160px) rotate(100deg); }
+            100% { right: 80%; transform: scaleX(-1) translate(-280px, 100px) rotate(240deg); opacity: 0.8; }
+        }
+
+        /* 하단 메치기 버튼 확대 */
+        #controls { position: absolute; bottom: 40px; width: 100%; padding: 0 30px; z-index: 100; }
+        .pixel-btn {
+            width: 100%; padding: 35px; /* 버튼 높이 증가 */
+            font-family: 'Press Start 2P', cursive;
+            font-size: 30px; /* 버튼 글씨 크기 대폭 증가 */
+            background: #e74c3c; color: white;
+            border: none; border-bottom: 12px solid #c0392b; cursor: pointer;
+            text-shadow: 4px 4px 0 #000; box-shadow: 0 10px 0 rgba(0,0,0,0.5);
+            line-height: 1.4;
+        }
+        .pixel-btn:active { margin-top: 8px; border-bottom-width: 4px; box-shadow: 0 2px 0 rgba(0,0,0,0.5); }
+        .pixel-btn:disabled { background: #7f8c8d; border-bottom-color: #555; }
+
+        .flash { animation: screen-flash 0.15s 2; }
+        @keyframes screen-flash { 0%, 100% { background: var(--dojo-wall); } 50% { background: #fff; } }
+        
+        .confetti { position: absolute; width: 12px; height: 12px; z-index: 1000; border: 2px solid #000; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="dojo-bg"><div class="scroll">柔道</div></div>
+    <div class="tatami-floor"></div>
+
+    <div id="ui-layer">
+        <div id="status-container">
+            <div id="status-text">시합 대기</div>
+        </div>
+        <div class="timer-box" id="timer-display">00:00.00</div>
+    </div>
+
+    <div id="match-area">
+        <div id="referee" class="sprite-container">
+            <svg viewBox="0 0 120 200">
+                <ellipse cx="60" cy="180" rx="35" ry="10" fill="rgba(0,0,0,0.3)" />
+                <rect x="40" y="20" width="40" height="40" fill="var(--skin-tone)" class="pixel-stroke" />
+                <rect x="40" y="45" width="40" height="15" fill="var(--skin-shadow)" class="pixel-stroke" />
+                <g id="face-ref">
+                    <rect x="50" y="30" width="6" height="6" fill="#000" />
+                    <rect x="64" y="30" width="6" height="6" fill="#000" />
+                    <rect x="54" y="46" width="12" height="3" fill="#000" />
+                </g>
+                <rect x="30" y="60" width="60" height="80" fill="#222" class="pixel-stroke" />
+                <rect x="45" y="60" width="30" height="30" fill="#fff" class="pixel-stroke" />
+                <rect x="56" y="60" width="8" height="40" fill="#e74c3c" class="pixel-stroke" /> </svg>
+        </div>
+
+        <div id="player-white" class="sprite-container">
+            <svg viewBox="0 0 120 200">
+                <ellipse cx="60" cy="190" rx="40" ry="12" fill="rgba(0,0,0,0.3)" /> <rect x="40" y="10" width="40" height="40" fill="var(--skin-tone)" class="pixel-stroke"/> 
+                <rect x="40" y="35" width="40" height="15" fill="var(--skin-shadow)" />
+                <g id="face-white">
+                    <rect class="face-part" x="48" y="22" width="6" height="6" fill="#000" />
+                    <rect class="face-part" x="66" y="22" width="6" height="6" fill="#000" />
+                    <rect class="face-part mouth" id="mouth-white" x="55" y="36" width="10" height="4" fill="#000" />
+                </g>
+                
+                <path d="M25,50 L95,50 L105,140 L15,140 Z" fill="var(--white-gi)" class="pixel-stroke" />
+                
+                <rect class="arm arm-back pixel-stroke" x="18" y="55" width="24" height="65" fill="var(--white-gi)" />
+                
+                <rect x="15" y="105" width="90" height="14" fill="#111" class="pixel-stroke" />
+                
+                <rect x="30" y="140" width="25" height="50" fill="var(--white-gi)" class="pixel-stroke"/>
+                <rect x="65" y="140" width="25" height="50" fill="var(--white-gi)" class="pixel-stroke"/>
+                <rect x="30" y="190" width="25" height="10" fill="var(--skin-tone)" class="pixel-stroke"/>
+                <rect x="65" y="190" width="25" height="10" fill="var(--skin-tone)" class="pixel-stroke"/>
+                
+                <rect class="arm arm-front pixel-stroke" x="78" y="55" width="24" height="65" fill="var(--white-gi)" />
+            </svg>
+        </div>
+
+        <div id="player-blue" class="sprite-container">
+            <svg viewBox="0 0 120 200">
+                <ellipse cx="60" cy="190" rx="40" ry="12" fill="rgba(0,0,0,0.3)" />
+                <rect x="40" y="10" width="40" height="40" fill="var(--skin-tone)" class="pixel-stroke"/>
+                <rect x="40" y="35" width="40" height="15" fill="var(--skin-shadow)" />
+                <g id="face-blue">
+                    <rect class="face-part" x="48" y="22" width="6" height="6" fill="#000" />
+                    <rect class="face-part" x="66" y="22" width="6" height="6" fill="#000" />
+                    <rect class="face-part mouth" id="mouth-blue" x="55" y="36" width="10" height="4" fill="#000" />
+                </g>
+                
+                <path d="M25,50 L95,50 L105,140 L15,140 Z" fill="var(--blue-gi)" class="pixel-stroke" />
+                
+                <rect class="arm arm-back pixel-stroke" x="18" y="55" width="24" height="65" fill="var(--blue-gi)" />
+                <rect x="15" y="105" width="90" height="14" fill="#111" class="pixel-stroke" />
+                
+                <rect x="30" y="140" width="25" height="50" fill="var(--blue-gi)" class="pixel-stroke"/>
+                <rect x="65" y="140" width="25" height="50" fill="var(--blue-gi)" class="pixel-stroke"/>
+                <rect x="30" y="190" width="25" height="10" fill="var(--skin-tone)" class="pixel-stroke"/>
+                <rect x="65" y="190" width="25" height="10" fill="var(--skin-tone)" class="pixel-stroke"/>
+                
+                <rect class="arm arm-front pixel-stroke" x="78" y="55" width="24" height="65" fill="var(--blue-gi)" />
+            </svg>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button id="main-btn" class="pixel-btn">시합 시작<br>(START)</button>
+    </div>
+</div>
+
+<script>
+    const state = { IDLE: 'IDLE', BOWING: 'BOWING', READY: 'READY', GRABBED: 'GRABBED', FINISH: 'FINISH', FOUL: 'FOUL' };
+    let curState = state.IDLE;
+    let startTime = 0;
+    let reactionTimer = null;
+    let stopwatchInterval = null;
+
+    const btn = document.getElementById('main-btn');
+    const status = document.getElementById('status-text');
+    const timerTxt = document.getElementById('timer-display');
+    const tori = document.getElementById('player-white'); 
+    const uke = document.getElementById('player-blue');   
+    const container = document.getElementById('game-container');
+
+    function formatTime(ms) {
+        const total = ms / 1000;
+        const s = Math.floor(total % 60).toString().padStart(2, '0');
+        const msPart = (total % 1).toFixed(2).substring(2);
+        return `${s}:${msPart}`;
+    }
+
+    function setFace(player, type) {
+        const mouth = document.getElementById(`mouth-${player}`);
+        if (!mouth) return;
+        
+        if (type === 'tense') {
+            mouth.setAttribute('width', '18');
+            mouth.setAttribute('x', '51');
+            mouth.setAttribute('height', '4');
+            mouth.removeAttribute('rx');
+        } else if (type === 'shock') {
+            mouth.setAttribute('width', '14');
+            mouth.setAttribute('height', '14');
+            mouth.setAttribute('x', '53');
+            mouth.setAttribute('y', '32');
+            mouth.setAttribute('rx', '4');
+        } else {
+            mouth.setAttribute('width', '10');
+            mouth.setAttribute('height', '4');
+            mouth.setAttribute('x', '55');
+            mouth.setAttribute('y', '36');
+            mouth.removeAttribute('rx');
+        }
+    }
+
+    function resetVisuals() {
+        tori.className = 'sprite-container';
+        uke.className = 'sprite-container';
+        container.classList.remove('flash');
+        status.style.color = "white";
+        tori.style.opacity = "1";
+        uke.style.opacity = "1";
+        setFace('white', 'idle');
+        setFace('blue', 'idle');
+    }
+
+    function triggerFoul() {
+        clearTimeout(reactionTimer);
+        curState = state.FOUL;
+        status.innerHTML = "반칙패<br>FALSE START";
+        status.style.color = "#ff4444";
+        btn.innerHTML = "다시 시작<br>(RESTART)";
+        btn.disabled = false;
+        tori.style.opacity = "0.5";
+    }
+
+    function startMatch() {
+        curState = state.BOWING;
+        resetVisuals();
+        btn.disabled = true;
+        btn.textContent = "WAIT...";
+        status.innerHTML = "차렷, 경례!<br>(REI)";
+        
+        // 확실한 인사 애니메이션 클래스 적용
+        tori.classList.add('bow-white');
+        uke.classList.add('bow-blue');
+
+        setTimeout(() => {
+            tori.classList.remove('bow-white');
+            uke.classList.remove('bow-blue');
+            curState = state.READY;
+            status.innerHTML = "준비...<br>(HAJIME)";
+            
+            const delay = Math.random() * 2000 + 1500;
+            reactionTimer = setTimeout(onGrabTrigger, delay);
+        }, 1200);
+    }
+
+    function onGrabTrigger() {
+        curState = state.GRABBED;
+        startTime = performance.now();
+        
+        status.innerHTML = "잡았다!<br>(GRABBED!)";
+        status.style.color = "#ffd700";
+        btn.disabled = false;
+        btn.innerHTML = "메치기!<br>(THROW!)"; // 버튼 글씨 대폭 확대 확인 가능
+        btn.style.backgroundColor = "#2ecc71";
+        btn.style.borderBottomColor = "#27ae60";
+
+        tori.classList.add('grab-white');
+        uke.classList.add('grab-blue');
+        setFace('white', 'tense'); 
+        setFace('blue', 'shock');  
+
+        stopwatchInterval = setInterval(() => {
+            const now = performance.now();
+            timerTxt.textContent = formatTime(now - startTime);
+        }, 10);
+    }
+
+    function performThrow() {
+        clearInterval(stopwatchInterval);
+        const finalTime = performance.now() - startTime;
+        curState = state.FINISH;
+        
+        container.classList.add('flash');
+        
+        const isSeoi = Math.random() > 0.5;
+        const techniqueName = isSeoi ? "업어치기!" : "허벅다리!";
+        
+        status.innerHTML = `한판!<br>${techniqueName}`;
+        timerTxt.textContent = formatTime(finalTime);
+
+        tori.classList.remove('grab-white');
+        uke.classList.remove('grab-blue');
+
+        if (isSeoi) {
+            tori.classList.add('tori-seoi');
+            uke.classList.add('uke-seoi');
+        } else {
+            tori.classList.add('tori-uchi');
+            uke.classList.add('uke-uchi');
+        }
+
+        createConfetti();
+        
+        btn.innerHTML = "다시 하기<br>(REMATCH)";
+        btn.style.backgroundColor = "#e74c3c";
+        btn.style.borderBottomColor = "#c0392b";
+    }
+
+    function createConfetti() {
+        for (let i = 0; i < 40; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + '%';
+            c.style.top = '10%';
+            c.style.backgroundColor = ['#f1c40f', '#fff', '#e74c3c', '#3498db'][Math.floor(Math.random()*4)];
+            document.body.appendChild(c);
+            
+            const destX = (Math.random() - 0.5) * 500;
+            const destY = Math.random() * 500 + 300;
+            
+            c.animate([
+                { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+                { transform: `translate(${destX}px, ${destY}px) rotate(720deg)`, opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0, .9, .6, 1)'
+            }).onfinish = () => c.remove();
+        }
+    }
+
+    function handleInteraction() {
+        if (curState === state.IDLE || curState === state.FINISH || curState === state.FOUL) {
+            startMatch();
+        } else if (curState === state.READY) {
+            triggerFoul();
+        } else if (curState === state.GRABBED) {
+            performThrow();
+        }
+    }
+
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleInteraction(); });
+    btn.addEventListener('mousedown', (e) => { e.preventDefault(); handleInteraction(); });
+
+</script>
+</body>
+</html>
