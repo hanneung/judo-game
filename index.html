@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JUDO REACTION 16-BIT ULTIMATE v2.1</title>
+    <title>JUDO REACTION 16-BIT ULTIMATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,34 +17,43 @@
             --skin-tone: #fcdfb6;
             --skin-shadow: #dfaf7e;
             --ui-gold: #ffd700;
+            
             --stroke-white: #b0b0b0;
             --stroke-blue: #163057;
             --stroke-skin: #d19b66;
             --stroke-dark: #222222;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; user-select: none; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%; height: 100dvh;
+        body, html {
+            margin: 0; padding: 0; width: 100%; 
+            height: 100vh; /* 데스크탑 호환성(Fallback) 추가 */
+            height: 100dvh;
             background-color: #111; overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
             font-family: 'Press Start 2P', cursive; color: white;
         }
 
         #game-container {
-            position: relative; width: 100%; height: 100%; height: 100dvh;
-            max-width: 600px; max-height: 900px;
+            position: relative; width: 100%; 
+            height: 100vh; /* 데스크탑 호환성(Fallback) 추가 */
+            height: 100dvh;
+            max-width: 600px; margin: 0 auto;
             background: var(--dojo-wall);
             border-left: 8px solid #000; border-right: 8px solid #000;
             display: flex; flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
+        /* 배경 */
         .dojo-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 60%;
-            background: linear-gradient(to bottom, #2c2c2c 0%, #1a1a1a 18%, transparent 18%),
-                        repeating-linear-gradient(90deg, #c4baa8 0, #c4baa8 4px, transparent 4px, transparent 40px);
+            background: 
+                linear-gradient(to bottom, #2c2c2c 0%, #1a1a1a 18%, transparent 18%),
+                repeating-linear-gradient(90deg, #c4baa8 0, #c4baa8 4px, transparent 4px, transparent 40px);
             z-index: 1;
         }
 
@@ -53,200 +62,4 @@
             width: 70px; height: 120px; background: #fffdf7;
             border: 4px solid #5c3a21; box-shadow: 4px 6px 0 rgba(0,0,0,0.3);
             writing-mode: vertical-rl; color: #111; font-size: 20px;
-            text-align: center; padding: 12px; font-weight: bold; z-index: 3;
-        }
-
-        .tatami-floor {
-            position: absolute; bottom: 0; width: 100%; height: 45%;
-            background-color: var(--tatami-yellow);
-            background-image: linear-gradient(var(--tatami-border) 3px, transparent 3px),
-                              linear-gradient(90deg, var(--tatami-border) 3px, transparent 3px);
-            background-size: 100px 50px;
-            border-top: 10px solid #4a3219; z-index: 2;
-        }
-
-        #ui-layer { position: relative; z-index: 10; padding: 25px 15px; display: flex; flex-direction: column; align-items: center; }
-        #status-container { background-color: #222; border: 4px solid var(--ui-gold); padding: 12px 25px; margin-bottom: 15px; box-shadow: 4px 4px 0 rgba(0,0,0,0.8); }
-        #status-text { font-size: 18px; text-shadow: 2px 2px 0 #000; text-align: center; line-height: 1.4; color: #fff; }
-        .timer-box { background: #111; padding: 12px 20px; border: 4px solid #fff; font-size: 24px; color: #fff; letter-spacing: 2px; }
-
-        .sprite-container { position: absolute; bottom: 15%; width: 150px; height: 200px; z-index: 5; transition: transform 0.2s, left 0.3s, right 0.3s; }
-        svg { shape-rendering: crispEdges; }
-        .stroke-white { stroke: var(--stroke-white); stroke-width: 2.5px; }
-        .stroke-blue { stroke: var(--stroke-blue); stroke-width: 2.5px; }
-        .stroke-skin { stroke: var(--stroke-skin); stroke-width: 2.5px; }
-        .stroke-dark { stroke: var(--stroke-dark); stroke-width: 2.5px; }
-
-        #referee { left: 50%; transform: translateX(-50%) scale(0.6); bottom: 35%; }
-        #player-white { left: 5%; }
-        #player-blue { right: 5%; transform: scaleX(-1); }
-
-        .bow-white { transform: rotate(25deg) translateY(10px) !important; }
-        .bow-blue { transform: scaleX(-1) rotate(25deg) translateY(10px) !important; } 
-        .grab-white { left: 16% !important; }
-        .grab-blue { right: 16% !important; transform: scaleX(-1); }
-
-        /* Throwing Animations */
-        .tori-seoi { animation: tori-seoi-anim 0.6s forwards; }
-        @keyframes tori-seoi-anim { 0% { left: 16%; } 30% { left: 35%; transform: scaleX(-1) translateY(20px); } 100% { left: 40%; transform: scaleX(-1) rotate(-30deg); } }
-        .uke-seoi { animation: uke-seoi-anim 0.6s forwards; }
-        @keyframes uke-seoi-anim { 0% { right: 16%; } 40% { right: 40%; transform: scaleX(-1) translate(-100px, -200px) rotate(140deg); } 100% { right: 70%; transform: scaleX(-1) translate(-250px, 90px) rotate(280deg); opacity: 0; } }
-
-        .tori-uchi { animation: tori-uchi-anim 0.6s forwards; }
-        @keyframes tori-uchi-anim { 0% { left: 16%; } 40% { left: 35%; transform: rotate(20deg); } 100% { left: 40%; transform: rotate(-10deg); } }
-        .uke-uchi { animation: uke-uchi-anim 0.6s forwards; }
-        @keyframes uke-uchi-anim { 0% { right: 16%; } 40% { right: 35%; transform: scaleX(-1) translate(-60px, -160px) rotate(100deg); } 100% { right: 80%; transform: scaleX(-1) translate(-250px, 100px) rotate(240deg); opacity: 0; } }
-
-        #controls { position: absolute; bottom: 30px; width: 100%; padding: 0 20px; z-index: 100; }
-        .pixel-btn {
-            width: 100%; padding: 24px; font-family: 'Press Start 2P', cursive; font-size: 18px; 
-            background: #e74c3c; color: white; border: none; border-bottom: 8px solid #c0392b; 
-            cursor: pointer; text-shadow: 2px 2px 0 #000; border-radius: 8px;
-        }
-        /* Visual Waiting State */
-        .pixel-btn-waiting { background: #7f8c8d !important; border-bottom-color: #555 !important; cursor: not-allowed; }
-        .pixel-btn:active:not(.pixel-btn-waiting) { transform: translateY(4px); border-bottom-width: 4px; }
-
-        .flash { animation: screen-flash 0.1s 3; }
-        @keyframes screen-flash { 0%, 100% { background: var(--dojo-wall); } 50% { background: #fff; } }
-        .confetti { position: absolute; width: 10px; height: 10px; z-index: 1000; }
-    </style>
-</head>
-<body>
-
-<div id="game-container">
-    <div class="dojo-bg"><div class="scroll">柔道</div></div>
-    <div class="tatami-floor"></div>
-    <div id="ui-layer">
-        <div id="status-container"><div id="status-text">HAJIME!</div></div>
-        <div class="timer-box" id="timer-display">00:00.00</div>
-    </div>
-    <div id="match-area">
-        <div id="referee" class="sprite-container">
-            <svg viewBox="0 0 120 200">
-                <rect x="40" y="20" width="40" height="40" fill="var(--skin-tone)" class="stroke-skin" />
-                <rect x="30" y="60" width="60" height="80" fill="#222" class="stroke-dark" />
-                <rect x="45" y="60" width="30" height="30" fill="#fff" />
-                <rect x="56" y="60" width="8" height="40" fill="#c0392b" /> 
-            </svg>
-        </div>
-        <div id="player-white" class="sprite-container">
-            <svg viewBox="0 0 120 200">
-                <rect x="40" y="10" width="40" height="40" fill="var(--skin-tone)" class="stroke-skin"/> 
-                <path d="M25,50 L95,50 L105,140 L15,140 Z" fill="var(--white-gi)" class="stroke-white" />
-                <rect x="25" y="105" width="70" height="14" fill="#222" />
-                <rect id="mouth-white" x="55" y="36" width="10" height="4" fill="#000" />
-            </svg>
-        </div>
-        <div id="player-blue" class="sprite-container">
-            <svg viewBox="0 0 120 200">
-                <rect x="40" y="10" width="40" height="40" fill="var(--skin-tone)" class="stroke-skin"/>
-                <path d="M25,50 L95,50 L105,140 L15,140 Z" fill="var(--blue-gi)" class="stroke-blue" />
-                <rect x="25" y="105" width="70" height="14" fill="#222" />
-                <rect id="mouth-blue" x="55" y="36" width="10" height="4" fill="#000" />
-            </svg>
-        </div>
-    </div>
-    <div id="controls"><button id="main-btn" class="pixel-btn">시합 시작</button></div>
-</div>
-
-<script>
-    const state = { IDLE: 'IDLE', BOWING: 'BOWING', WAITING: 'WAITING', GRABBED: 'GRABBED', FINISH: 'FINISH', FOUL: 'FOUL' };
-    let curState = state.IDLE;
-    let startTime = 0;
-    let reactionTimer = null;
-    let stopwatchInterval = null;
-
-    const btn = document.getElementById('main-btn');
-    const status = document.getElementById('status-text');
-    const timerTxt = document.getElementById('timer-display');
-    const tori = document.getElementById('player-white'); 
-    const uke = document.getElementById('player-blue');   
-    const container = document.getElementById('game-container');
-
-    function formatTime(ms) {
-        const total = ms / 1000;
-        const m = Math.floor(total / 60).toString().padStart(2, '0');
-        const s = Math.floor(total % 60).toString().padStart(2, '0');
-        const msPart = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
-        return `${m}:${s}.${msPart}`;
-    }
-
-    function triggerFoul() {
-        clearTimeout(reactionTimer);
-        curState = state.FOUL;
-        status.innerHTML = "반칙패!<br>FALSE START";
-        status.style.color = "#ff4444";
-        btn.innerHTML = "다시 시작";
-        btn.classList.remove('pixel-btn-waiting');
-        tori.style.opacity = "0.5";
-    }
-
-    function startMatch() {
-        curState = state.BOWING;
-        tori.className = 'sprite-container';
-        uke.className = 'sprite-container';
-        tori.style.opacity = "1";
-        status.style.color = "white";
-        timerTxt.textContent = "00:00.00";
-        
-        btn.classList.add('pixel-btn-waiting');
-        btn.textContent = "WAIT...";
-        status.innerHTML = "차렷, 경례!";
-        
-        tori.classList.add('bow-white');
-        uke.classList.add('bow-blue');
-
-        setTimeout(() => {
-            tori.classList.remove('bow-white');
-            uke.classList.remove('bow-blue');
-            curState = state.WAITING;
-            status.innerHTML = "준비... (Hajime)";
-            const delay = Math.random() * 2000 + 1500;
-            reactionTimer = setTimeout(() => {
-                curState = state.GRABBED;
-                startTime = performance.now();
-                status.innerHTML = "잡았다!";
-                status.style.color = "#ffd700";
-                btn.classList.remove('pixel-btn-waiting');
-                btn.innerHTML = "메치기!";
-                tori.classList.add('grab-white');
-                uke.classList.add('grab-blue');
-                stopwatchInterval = setInterval(() => {
-                    timerTxt.textContent = formatTime(performance.now() - startTime);
-                }, 10);
-            }, delay);
-        }, 1200);
-    }
-
-    function handleInteraction(e) {
-        if(e) e.preventDefault();
-        
-        // Critical Fix: Detect Foul if button clicked during WAITING
-        if (curState === state.WAITING || curState === state.BOWING) {
-            triggerFoul();
-            return;
-        }
-        
-        if (curState === state.GRABBED) {
-            clearInterval(stopwatchInterval);
-            curState = state.FINISH;
-            container.classList.add('flash');
-            const isSeoi = Math.random() > 0.5;
-            status.innerHTML = isSeoi ? "한판!<br>업어치기!" : "한판!<br>허벅다리!";
-            if (isSeoi) { tori.classList.add('tori-seoi'); uke.classList.add('uke-seoi'); }
-            else { tori.classList.add('tori-uchi'); uke.classList.add('uke-uchi'); }
-            btn.innerHTML = "다시 하기";
-            return;
-        }
-
-        if (curState === state.IDLE || curState === state.FINISH || curState === state.FOUL) {
-            startMatch();
-        }
-    }
-
-    btn.addEventListener('touchstart', handleInteraction, {passive: false});
-    btn.addEventListener('mousedown', handleInteraction);
-</script>
-</body>
-</html>
+            text-align: center; padding: 12px; font-weight: bold;
